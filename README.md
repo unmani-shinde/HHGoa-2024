@@ -1,2 +1,2 @@
-# hhGoa-2024
-Hacker House Goa: Initial Task - Core DAO Track
+# CoreRoulette
+Classic Roulette Game based on Core DAO
