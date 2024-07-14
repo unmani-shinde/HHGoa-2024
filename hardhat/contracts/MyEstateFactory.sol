@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
+
 import "./MyEstate.sol";
 
 contract EstateFactory is ERC721, ERC721URIStorage, Ownable {
@@ -15,7 +16,7 @@ contract EstateFactory is ERC721, ERC721URIStorage, Ownable {
         uint256 estateID;
         address payable estateOwner;
         string estateName;
-        uint256 estateEvaluation;
+        uint256 estateEvaluation; //In Wei
         bool isListedforAuction;
         bool isListedtoInvest;
     }
@@ -71,7 +72,7 @@ contract EstateFactory is ERC721, ERC721URIStorage, Ownable {
         require(Tokens[estateId].isListedtoInvest==false, "Property already Listed for Investment!");
         require(Tokens[estateId].estateOwner==payable(address(msg.sender)),"You are not the current owner of this Estate!");
         bytes32 _salt = keccak256(abi.encodePacked(block.timestamp, msg.sender));
-        latestEstateAddress = Create2.deploy(0,_salt, abi.encodePacked(type(MyEstateWallet).creationCode, abi.encode(estateId))
+        latestEstateAddress = Create2.deploy(0,_salt, abi.encodePacked(type(MyEstateWallet).creationCode, abi.encode(estateId,Tokens[estateId].estateEvaluation))
         );
         _transfer(address(msg.sender), latestEstateAddress, estateId); // Optional, depending on logic
         Tokens[estateId].isListedtoInvest = true;
