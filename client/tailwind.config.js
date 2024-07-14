@@ -7,9 +7,13 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    fontFamily:{
+      'sans': ['Helvetica', 'Arial', 'sans-serif'],
+    }
   },
   plugins: [
     flowbite.plugin(),
-    require('flowbite/plugin')
+    require('flowbite/plugin'),
+    require('@tailwindcss/forms'),
   ],
 };

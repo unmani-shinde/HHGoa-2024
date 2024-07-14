@@ -1,15 +1,20 @@
 //import { useState } from 'react'
 import './App.css'
-import NavigationBar from './components/NavBar'
+import { BrowserRouter as Router, Routes,Route } from 'react-router-dom'
+import Landing from './pages/LandingPage'
+import Tokenize from './pages/TokenizeEstate'
+
 
 function App() {
   
 
   return (
-    <>
-    <NavigationBar/>
-      
-    </>
+    <Router>
+      <Routes>
+        <Route path='/' element={<Landing/>}/>
+        <Route path='/tokenize-estate' element={<Tokenize/>}/>
+      </Routes>
+    </Router>
   )
 }
 
