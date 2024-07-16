@@ -1,6 +1,7 @@
 "use client"
 
 import Hero from "@/components/HomePage/Hero";
+import { Web3Provider } from "@/providers/Web3Provider";
 
 export function Home() {
   return (
@@ -12,7 +13,10 @@ export function Home() {
 
 export default function App(){
   return(
-    <Home/>
+    <Web3Provider>
+      <Home/>
+    </Web3Provider>
+    
   )
 
 }

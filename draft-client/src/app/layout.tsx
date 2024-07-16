@@ -1,7 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
 import NavigationBar from "@/components/NavigationBar";
-import { Web3Provider } from "@/providers/Web3Provider";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 
@@ -20,10 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <Web3Provider>
-          <NavigationBar />
+      <NavigationBar />
           {children}
-        </Web3Provider>
       </body>
     </html>
   );

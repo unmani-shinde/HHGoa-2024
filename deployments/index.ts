@@ -1,0 +1,1 @@
+export const factoryContractAddress:string = "0x462706e40BC7aCD2bF1a59D71C624DcD49b6D951";
