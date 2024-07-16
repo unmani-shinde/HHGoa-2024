@@ -8,7 +8,7 @@ const navigation = [
   { name: 'Tokenize Estate', href: '/tokenize-estate' },
   { name: 'List My Estate', href: '/list-estate' },
   { name: 'Estate Auctions', href: '/estate-auctions' },
-  { name: 'Estate Investments', href: '/estate-investments' },
+  { name: 'Estate Investments', href: '#' },
 ]
 
 export default function NavigationBar() {

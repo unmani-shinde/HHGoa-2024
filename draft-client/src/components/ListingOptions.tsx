@@ -21,7 +21,7 @@ export function ListingOptions() {
         if(selectedOption=='auction'){
             await writeContract({
                 abi: factoryContractABI,
-                address: '0x462706e40BC7aCD2bF1a59D71C624DcD49b6D951',
+                address: '0xB7FEf1058C49FFAd843b0F24E0c59999F7ecf0CB',
                 functionName: 'listEstateForAuction',
                 args: [estateId],
               });
@@ -30,7 +30,7 @@ export function ListingOptions() {
         else if(selectedOption=='investment'){
             await writeContract({
                 abi: factoryContractABI,
-                address: '0x462706e40BC7aCD2bF1a59D71C624DcD49b6D951',
+                address: '0xB7FEf1058C49FFAd843b0F24E0c59999F7ecf0CB',
                 functionName: 'listEstateForInvestment',
                 args: [estateId],
               });

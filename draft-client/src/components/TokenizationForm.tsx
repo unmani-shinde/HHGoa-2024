@@ -15,7 +15,7 @@ export function TokenForm() {
     try {
       writeContract({
         abi: factoryContractABI,
-        address: '0x462706e40BC7aCD2bF1a59D71C624DcD49b6D951',
+        address: '0xB7FEf1058C49FFAd843b0F24E0c59999F7ecf0CB',
         functionName: 'tokenizeEstate',
         args: [metadata, evaluation],
       });
@@ -45,7 +45,7 @@ export function TokenForm() {
         </div>
         <div>
           <div className="mb-2 block">
-            <Label className="text-md" htmlFor="evaluation" value="Estate Evaluation (in ETH)" />
+            <Label className="text-md" htmlFor="evaluation" value="Estate Evaluation (in tCORE)" />
           </div>
           <TextInput
             id="evaluation"

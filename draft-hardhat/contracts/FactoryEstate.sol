@@ -71,6 +71,14 @@ contract EstateFactory is ERC1155{
         
     }
 
+    function getEstateAuctionListing(uint256 estateId) external view returns (address) {
+        return EstateAuctionListings[estateId];
+    }
+
+    function getNumEstates() external view returns (uint256) {
+        return _nextTokenId-1;
+    }
+
     function setURI(string memory newuri) private {
         _setURI(newuri);
     }
