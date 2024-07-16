@@ -1,29 +1,24 @@
 // SPDX-License-Identifier: MIT
 // Compatible with OpenZeppelin Contracts ^5.0.0
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
-import "./WalletEstate.sol";
-import "./AuctionEstate.sol";
+import "WalletEstate.sol";
+import "AuctionEstate.sol";
 
-contract EstateFactory is ERC1155, Ownable, ERC1155Supply{
+contract EstateFactory is ERC1155{
 
     //TokenID = 0 represents the ERC20 Tokens
 
-    uint256 private _nextTokenId;
+    uint256 private _nextTokenId=1;
     address private latestEstateAddress;
     address private latestAuctionAddress;
 
 
     constructor()
-        ERC1155("https://ipfs.io/ipfs/")
-        Ownable(address(msg.sender))      
-    {
-        _nextTokenId = 1;
-    }
+        ERC1155("")        
+    {}
 
     struct Estate{
         uint256 estateID;
@@ -32,24 +27,24 @@ contract EstateFactory is ERC1155, Ownable, ERC1155Supply{
         string estateMetadata;
     }
     
-    mapping (uint256 => Estate) public Estates;
-    mapping (uint256 => address) public EstateInvestmentListings; //estate id -> estate wallet contract address
-    mapping (uint256 => address) public EstateAuctionListings; //estate id -> estate auction contract address
+    mapping (uint256 => Estate) private Estates;
+    mapping (uint256 => address) private EstateInvestmentListings; //estate id -> estate wallet contract address
+    mapping (uint256 => address) private EstateAuctionListings; //estate id -> estate auction contract address
 
     // mapping (uint256 => address payable ) private platformUsers;
 
-    event EstateTokenCreated(uint256 tokenId);
+    
 
     // Factory Functions
 
     function tokenizeEstate(string memory _metadata,uint256 _evaluation) public  {
         require(_evaluation>0, "Evaluation of the Estate must be more than zero!");
-
+        address payable addr = payable(address(msg.sender));
         //Mint Estate Token to Owner
                  
          uint256 tokenId = _nextTokenId;
         _nextTokenId++;
-        mint(address(msg.sender),tokenId,1,"");
+        mint(addr,tokenId,1,"");
         setURI(_metadata);
 
         //Create Estate Listing
@@ -60,7 +55,7 @@ contract EstateFactory is ERC1155, Ownable, ERC1155Supply{
             estateEvaluation: _evaluation 
 
         });
-        emit EstateTokenCreated(tokenId);
+       
         
     }
 
@@ -85,51 +80,33 @@ contract EstateFactory is ERC1155, Ownable, ERC1155Supply{
         
     }
 
-    function getLatestEstateAddress() public view returns (address) {
-        return latestEstateAddress;
-    }
 
-     function getLatestAuctionAddress() public view returns (address) {
-        return latestAuctionAddress;
-    }
 
      function getNumEstates() public view returns(uint256) {
         return _nextTokenId-1;
     }
-    
-    function getEstate(uint256 estateId) public view returns (Estate memory) {
-        return Estates[estateId];
-    }
-
-    
+       
 
     // Wizard Functions
 
 
-    function setURI(string memory newuri) public {
+    function setURI(string memory newuri) private {
         _setURI(newuri);
     }
 
-    function mint(address account, uint256 id, uint256 amount,bytes memory data) public
+    function mint(address account, uint256 id, uint256 amount,bytes memory data) private
     {
         _mint(account, id, amount,data);
     }
 
     function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
-        public
+        private
         
     {
         _mintBatch(to, ids, amounts, data);
     }
 
-    // The following functions are overrides required by Solidity.
 
-    function _update(address from, address to, uint256[] memory ids, uint256[] memory values)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._update(from, to, ids, values);
-    }
 }
 
 
