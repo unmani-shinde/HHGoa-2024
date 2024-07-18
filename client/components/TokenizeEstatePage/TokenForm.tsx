@@ -25,25 +25,20 @@ export function TokenForm() {
     const [metadata,setMetadata] = useState<String>("");
     const [evaluation,setEvaluation] = useState<Number>(0);
 
-    const handleCreateToken = async() => {
-
-        try {
-            await writeContract({
-                abi:FactoryContract.abi,
-                address:process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
-                functionName:"tokenizeEstate",
-                args:[metadata,evaluation]
-            })
-            alert("The token creation was successful!")
-            
-        } catch (error) {
-            alert("There was an error creating your token.")
-            
-        }
-
-        
-
-    }
+    const handleTokenizeEstate = (event) => {
+      event.preventDefault();
+      try {
+        writeContract({
+          abi: FactoryContract.abi,
+          address: process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
+          functionName: 'tokenizeEstate',
+          args: [metadata.toString(), Number(evaluation)],
+        });
+        alert('The token creation was successful!');
+      } catch (error) {
+        alert('There was an error creating your token.');
+      }
+    };
 
 
  
@@ -74,7 +69,7 @@ export function TokenForm() {
           </div>
   
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6">
+            <form onSubmit={handleTokenizeEstate} className="space-y-6">
               <div>
                 <label htmlFor="text" className="block text-sm font-medium leading-6 text-gray-900">
                   Token Metadata
@@ -117,7 +112,6 @@ export function TokenForm() {
               <div>
                 <button
                   type="submit"
-                  onClick={handleCreateToken}
                   className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   Create Estate Token

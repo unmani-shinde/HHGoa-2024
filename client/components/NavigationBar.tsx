@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Dialog, DialogPanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react';
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import ShareBlockLogo from "@/assets/blockShare.png";
 
 const navigation = [
@@ -10,20 +10,20 @@ const navigation = [
   { name: 'My Tokens', href: '/my-tokens' },
   { name: 'Marketplace', href: '#' },
   { name: 'Company', href: '#' },
-]
+];
 
 export default function NavigationBar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="bg-white">
-      <header className="absolute inset-x-0 top-0 z-50">
+    <div className="bg-gray-50">
+      <header className="fixed inset-x-0 top-0 z-50  bg-gray-50 shadow-md">
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
           <div className="flex lg:flex-1">
             <a href="/" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
               <img
-                alt=""
+                alt="ShareBlock Logo"
                 src={ShareBlockLogo.src}
                 className="h-8 w-auto"
               />
@@ -46,9 +46,7 @@ export default function NavigationBar() {
               </a>
             ))}
           </div>
-          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            
-          </div>
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end"></div>
         </nav>
         <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
           <div className="fixed inset-0 z-50" />
@@ -57,7 +55,7 @@ export default function NavigationBar() {
               <a href="/" className="-m-1.5 p-1.5">
                 <span className="sr-only">Your Company</span>
                 <img
-                  alt=""
+                  alt="ShareBlock Logo"
                   src={ShareBlockLogo.src}
                   className="h-8 w-auto"
                 />
@@ -84,14 +82,12 @@ export default function NavigationBar() {
                     </a>
                   ))}
                 </div>
-                <div className="py-6">
-                  
-                </div>
+                <div className="py-6"></div>
               </div>
             </div>
           </DialogPanel>
         </Dialog>
       </header>
     </div>
-  )
+  );
 }
