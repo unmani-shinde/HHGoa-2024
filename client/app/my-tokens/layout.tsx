@@ -1,6 +1,7 @@
 'use client'
 import MyTokensPage from "./page";
-export default function MyTokensPageLayout({ children }) {
+import { MyTokensPageLayoutProps } from "@/utils/types/Estate";
+export default function MyTokensPageLayout({ children }: MyTokensPageLayoutProps) {
     
    
     return (

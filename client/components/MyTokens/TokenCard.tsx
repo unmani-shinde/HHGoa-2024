@@ -3,13 +3,10 @@
 
 import { Card } from "flowbite-react";
 import { EstateProps } from "@/utils/types/Estate";
+import React from "react";
 
 
 export default function CardComponent({ estate }: EstateProps) {
-
- 
-  
-  
 
   const truncateAddress = (address: string, length: number = 6): string => {
     if (!address) return '';
