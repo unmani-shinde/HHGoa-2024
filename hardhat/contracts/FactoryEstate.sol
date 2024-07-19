@@ -23,6 +23,8 @@ contract EstateFactory is ERC1155{
         address payable estateOwner;
         uint256 estateEvaluation;
         string estateMetadata;
+        bool isListedForAuction;
+        bool isListedForInvestment;
     }
 
     mapping (uint256 => Estate) private Estates;
@@ -44,8 +46,9 @@ contract EstateFactory is ERC1155{
             estateID:tokenId,
             estateOwner: payable(address(msg.sender)),
             estateMetadata:_metadata,
-            estateEvaluation: _evaluation 
-
+            estateEvaluation: _evaluation,
+            isListedForAuction:false,
+            isListedForInvestment:false
         });
         
     }
@@ -56,6 +59,7 @@ contract EstateFactory is ERC1155{
         );
         _safeTransferFrom(msg.sender,latestAuctionAddress, estateId, 1, "");
         EstateAuctionListings[estateId] = latestAuctionAddress;
+        Estates[estateId].isListedForAuction = true;
     }
 
     function listEstateForInvestment(uint256 estateId) external  {
@@ -68,6 +72,7 @@ contract EstateFactory is ERC1155{
         _safeTransferFrom(msg.sender,latestEstateAddress, estateId, 1, "");
 
         EstateInvestmentListings[estateId] = latestEstateAddress;
+        Estates[estateId].isListedForInvestment = true;
         
     }
 
@@ -77,6 +82,10 @@ contract EstateFactory is ERC1155{
 
     function getEstateInvestmentListing(uint256 estateId) external view returns (address) {
         return EstateInvestmentListings[estateId];
+    }
+
+    function updateOwner(uint256 estateID,address payable newOwner) external {
+        Estates[estateID].estateOwner = newOwner;
     }
 
     function getEstateAuctionListing(uint256 estateId) external view returns (address) {

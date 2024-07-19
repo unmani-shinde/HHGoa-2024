@@ -17,6 +17,7 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
 
     mapping (address=>uint256) public BidsPlaced;
 
+
     constructor(uint256 _id,uint256 _evaluation,uint256 _timestamp,address payable owner)
         ERC1155("")
     {   estateId = _id;
@@ -24,6 +25,14 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
         timestamp = _timestamp;
         highestBid = 0;
         estateOwner = owner;
+    }
+
+    function getAuctionDetails() external view returns(uint256,uint256,uint256,address payable,address payable,uint256){
+        return(estateId,estateEvaluation,highestBid,estateOwner,auctionWinner,timestamp);
+    }
+
+    function getAllBids() internal view returns(mapping (address=>uint256) storage){
+        return BidsPlaced;
     }
 
     function placeBid(uint256 bid) public payable  {

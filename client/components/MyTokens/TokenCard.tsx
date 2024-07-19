@@ -3,7 +3,7 @@
 
 import { Card } from "flowbite-react";
 import { EstateProps } from "@/utils/types/Estate";
-import React from "react";
+import { ListForAuctionButton } from "@/app/my-tokens";
 
 
 export default function CardComponent({ estate }: EstateProps) {
@@ -13,9 +13,32 @@ export default function CardComponent({ estate }: EstateProps) {
     return `${address.slice(0, length)}...${address.slice(-length)}`;
   };
 
+  // const { writeContract,data:txnHash } = useWriteContract();
+ 
+  // const { writeContract, data:TxnHash} = useWriteContract();
+  // const {isPending,isSuccess,isError} = useWaitForTransactionReceipt({
+  //   hash:TxnHash
+  // });
+
+  // const handleListforAuction = ({estateID}:EstateActionProps) =>{
+
+    
+  //   writeContract({
+  //     abi:FactoryContract.abi,
+  //     address: process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x{string}`,
+  //     functionName:'listEstateforAuction',
+  //     args:[estateID]
+  //   })
+
+    
+  //   if(isSuccess){
+  //     alert(`Your token was successfully listed for Auction! Txn Hash: ${TxnHash as string}`)
+  //   }
+  //   if(isError){
+  //     alert(`Token listing unsucessful! Txn Hash: ${TxnHash as string}`)
+  //   }
+  //}
   
-
-
   return (
     <Card
       className={`max-w-sm`}
@@ -33,12 +56,8 @@ export default function CardComponent({ estate }: EstateProps) {
       </p>
       <div className="flex flex-col lg:flex-row md:flex-col sm:flex-col items-center justify-between">
         
-        <button
-          
-          className="rounded-lg md:mb-2 sm:mb-2 mb-2 bg-fuchsia-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-fuchsia-800 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 dark:bg-fuchsia-600 dark:hover:bg-fuchsia-700 dark:focus:ring-fuchsia-800"
-        >
-          List for Auction
-        </button>
+        <ListForAuctionButton estateID={Number(estate?.estateID)}/>
+        
 
         <button
           className="rounded-lg bg-fuchsia-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-fuchsia-800 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 dark:bg-fuchsia-600 dark:hover:bg-fuchsia-700 dark:focus:ring-fuchsia-800"
