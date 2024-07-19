@@ -8,8 +8,8 @@ import ShareBlockLogo from "@/assets/blockShare.png";
 const navigation = [
   { name: 'Tokenize Estate', href: '/tokenize-estate' },
   { name: 'My Tokens', href: '/my-tokens/my-owned-estate-tokens' },
-  { name: 'Marketplace', href: '#' },
-  { name: 'Company', href: '#' },
+  { name: 'Auctions Marketplace', href: '/auctions-marketplace' },
+  { name: 'Investments Marketplace', href: '#' },
 ];
 
 export default function NavigationBar() {

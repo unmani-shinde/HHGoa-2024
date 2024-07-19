@@ -12,32 +12,6 @@ export default function CardComponent({ estate }: EstateProps) {
     if (!address) return '';
     return `${address.slice(0, length)}...${address.slice(-length)}`;
   };
-
-  // const { writeContract,data:txnHash } = useWriteContract();
- 
-  // const { writeContract, data:TxnHash} = useWriteContract();
-  // const {isPending,isSuccess,isError} = useWaitForTransactionReceipt({
-  //   hash:TxnHash
-  // });
-
-  // const handleListforAuction = ({estateID}:EstateActionProps) =>{
-
-    
-  //   writeContract({
-  //     abi:FactoryContract.abi,
-  //     address: process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x{string}`,
-  //     functionName:'listEstateforAuction',
-  //     args:[estateID]
-  //   })
-
-    
-  //   if(isSuccess){
-  //     alert(`Your token was successfully listed for Auction! Txn Hash: ${TxnHash as string}`)
-  //   }
-  //   if(isError){
-  //     alert(`Token listing unsucessful! Txn Hash: ${TxnHash as string}`)
-  //   }
-  //}
   
   return (
     <Card

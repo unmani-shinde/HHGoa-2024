@@ -1,7 +1,8 @@
 "use client"
 import React from 'react';
 import { FactoryContract } from '@/contracts/FactoryContract';
-import { useWriteContract } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
+import { AuctionContract } from '@/contracts/AuctionContract';
 import { EstateActionProps  } from "@/utils/types/Estate"
 
 export const ListForAuctionButton = ({ estateID }:EstateActionProps) => {
@@ -58,4 +59,30 @@ return (
     </button>
 );
 };
+
+export const PlaceBidButton = ({ estateID }:EstateActionProps) =>{
+
+    const { writeContract} = useWriteContract();
+
+    const { data:listingAddress } = useReadContract({
+        abi:FactoryContract.abi,
+        address:process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
+        functionName:'getEstateAuctionListing',
+        args:[estateID]
+    })
+
+    const handleButtonClick = async (bid:Number) => {
+        try {
+        writeContract({
+            abi: AuctionContract.abi,
+            address: listingAddress as `0x${string}`,
+            functionName: 'placeBid',
+            args: [bid],
+        });
+        } catch (error) {
+        console.error('Transaction failed', error);
+        }
+    };
+
+}
 

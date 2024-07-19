@@ -1,37 +1,40 @@
-"use client";
+"use client"
 
+import Fancy from "@/components/Fancy";
+import { Web3Provider } from "@/utils/providers/Web3Provider";
 import WagmiReads from "@/wagmi/wagmiReads";
 import { useAccount } from "wagmi";
-import CardComponent from "@/components/MyTokens/TokenCard";
-import { Web3Provider } from "@/utils/providers/Web3Provider";
 import { Estate } from "@/utils/types/Estate";
+import CardComponent from "@/components/MyTokens/TokenCard";
 
-
-
-export function EstateTokensListedforAuction() {
+export function AuctionsMarketplace() {
     const { numEstates, estates } = WagmiReads();
     const { address } = useAccount();
 
-    return (
-      <div className="flex-1 p-6 overflow-auto ml-16 lg:ml-72 md:ml-72 sm:ml-72">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    return(<>
+    <Fancy/>
+    <div className="flex-1 pt-24 p-6 overflow-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {estates?.map((estate, index) => {
             const estateResult = estate.result as Estate;
             if (estateResult.estateOwner === address && estateResult.isListedForAuction) {
               return (
-              <CardComponent estate={estateResult} />
+                <CardComponent key={index} estate={estateResult} />
               );
             }
             return null; // Return null if the condition is not met
           })}
         </div>
       </div>
-    );
+    </>)
+    
 }
+
 export default function Page() {
-    return (
+    return(
         <Web3Provider>
-            <EstateTokensListedforAuction/>
+            <AuctionsMarketplace/>
         </Web3Provider>
-    );
+    )
+    
 }

@@ -9,6 +9,7 @@ export type Estate = {
   
 export interface EstateProps {
     estate: Estate; // Make the estate prop optional if it might be undefined
+  
   }
 
 export interface EstateActionProps {

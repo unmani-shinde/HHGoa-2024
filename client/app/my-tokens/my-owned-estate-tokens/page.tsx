@@ -17,7 +17,7 @@ export function EstateTokensIOwn() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {estates?.map((estate, index) => {
             const estateResult = estate.result as Estate;
-            if (estateResult.estateOwner === address) {
+            if (estateResult.estateOwner === address && estateResult.isListedForAuction===false && estateResult.isListedForInvestment==false) {
               return (
               <CardComponent estate={estateResult} />
               );
