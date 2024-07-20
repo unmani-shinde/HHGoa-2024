@@ -1,13 +1,13 @@
 "use client"
 
-import { Button, Modal, Select } from "flowbite-react";
+import { Button, Modal,Table } from "flowbite-react";
 import React,{ useState } from "react";
 import { FactoryContract } from '@/contracts/FactoryContract';
-import { useReadContract, useWriteContract,useReadContracts } from "wagmi";
 import { AuctionContract } from '@/contracts/AuctionContract';
+import { useReadContract, useWriteContract,useReadContracts,useAccount,useDeployContract } from "wagmi";
 import { EstateBidActionProps,EstateActionProps  } from "@/utils/types/Estate"
 import Web3 from "web3"
-import { Table } from "flowbite-react";
+
 
 
 
@@ -41,17 +41,18 @@ export const ListForAuctionButton = ({ estateID }:EstateActionProps) => {
 
 export const ListForInvestmentButton = ({ estateID }:EstateActionProps) => {
 
-
-const { writeContract} = useWriteContract();
+const { writeContract,writeContractAsync } = useWriteContract();
 
 const handleButtonClick = async () => {
+  console.log(estateID);
+  
     try {
-    writeContract({
+    writeContractAsync({
         abi: FactoryContract.abi,
         address: process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
         functionName: 'listEstateForInvestment',
         args: [estateID],
-    });
+    });    
     } catch (error) {
     console.error('Transaction failed', error);
     }
@@ -104,9 +105,10 @@ export const PlaceBidButton = ({ estateID,bid }:EstateBidActionProps) =>{
 }
 
 export const AuctionDetailsDisplayButton = ({ estateID }:EstateActionProps) =>{
-
-  const { writeContract} = useWriteContract();
+    
   const [openModal, setOpenModal] = useState(false);
+  const account = useAccount();
+  const {writeContract,writeContractAsync} = useWriteContract();
   const [colourReveal, setColourReveal] = useState(false);
   const [modalPlacement, setModalPlacement] = useState('center')
 
@@ -150,19 +152,47 @@ const { data: bids, isLoading: bidsLoading } = useReadContracts({
 
 })
 
-  // const handleButtonClick = async () => {
-  //     try {
-  //     writeContract({
-  //         abi: AuctionContract.abi,
-  //         address: listingAddress as `0x${string}`,
-  //         functionName: 'placeBid',
-  //         args: [Number(Web3.utils.toWei(bid,'ether'))],
-  //         value:BigInt(Web3.utils.toWei(bid,'ether'))
-  //     });
-  //     } catch (error) {
-  //     console.error('Transaction failed', error);
-  //     }
-  // };
+  const handleButtonClick = async () => {
+    if(winnerAddress== account.address){
+      console.log("Hi this ");
+      
+      try {
+
+        await writeContractAsync({
+          abi: AuctionContract.abi,
+          address: listingAddress as `0x${string}`,
+          functionName: 'claimPrize',
+          args:[]
+        })  
+        
+        // writeContract({
+        //   abi: FactoryContract.abi,
+        //   address: process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x{string}`,
+        //   functionName: 'updateOwner',
+        //   args:[estateID,account.address]
+        // })
+        
+      } catch (error) {
+        console.error("There was an error",error)
+      }
+    }
+    else{
+      try {
+        writeContract({
+          abi: AuctionContract.abi,
+          address: listingAddress as `0x${string}`,
+          functionName: 'withdrawMyFunds'
+        })
+        
+      } catch (error) {
+        console.error('Transaction failed', error)
+        
+      }
+    }
+      
+  };
+
+  
 
   return (
     <>
@@ -184,7 +214,8 @@ const { data: bids, isLoading: bidsLoading } = useReadContracts({
         <p className="mb-2"><b><a href={`https://scan.test.btcs.network/address/${address}`}>Current Owner</a>: </b>{auctionData?.[3]}</p>
         <hr></hr>
         <p className="mt-4"><b>Estate Token ID: </b>#{Number(auctionData?.[0])}</p>
-        <p className="mb-2"><b>Estate Token Evaluation: </b>{Number(auctionData?.[1])} tCORE</p>
+        <p className="mb-2"><b>Estate Token Evaluation: </b>{Web3.utils.fromWei((auctionData?.[1] || "0").toString(), "ether")} tCORE</p>
+
         <hr></hr>
         <p className="mt-4 mb-2"><b>Bidders List: </b></p>
 
@@ -197,21 +228,23 @@ const { data: bids, isLoading: bidsLoading } = useReadContracts({
           
         </Table.Head>
         <Table.Body className="divide-y">
-          {bids?.map((bid,index)=>{
-            return(
-
-              <Table.Row className={`${allBiddersAddresses[index] === winnerAddress && colourReveal ? "bg-green-300" : "bg-white"} dark:border-gray-700 dark:bg-gray-800`}>
-              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                {allBiddersAddresses[index]}
-              </Table.Cell>
-              <Table.Cell>
-                {Web3.utils.fromWei(Number(bid?.result), "ether")}
-              </Table.Cell>
-            </Table.Row>
-
-
-            )
-          })}
+          
+        {bids?.map((bid, index) => {
+          const bidAmount = Web3.utils.fromWei(bid.result.toString(), "ether");
+          if (bidAmount !== "0.") {
+            return (
+              <Table.Row key={index} className={`${allBiddersAddresses[index] === winnerAddress && colourReveal ? "bg-green-300" : "bg-white"} dark:border-gray-700 dark:bg-gray-800`}>
+                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                  {allBiddersAddresses[index]}
+                </Table.Cell>
+                <Table.Cell>
+                  {bidAmount}
+                </Table.Cell>
+              </Table.Row>
+            );
+          }
+          return null; // Return null if the condition is not met
+        })}
          
          
         </Table.Body>
@@ -220,6 +253,12 @@ const { data: bids, isLoading: bidsLoading } = useReadContracts({
     </Modal.Body>
     <Modal.Footer>
       <Button color="purple" onClick={() => setColourReveal(true)}>Get Auction Winner</Button>
+      {colourReveal && (
+        <>
+          <Button onClick={handleButtonClick} color="gray">{
+          winnerAddress==account.address?"Claim My Prize":"Withdraw my Funds"}</Button>
+        </>
+      )}
     </Modal.Footer>
   </Modal>
     

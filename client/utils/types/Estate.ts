@@ -11,6 +11,8 @@ export interface EstateProps {
     estate: Estate; // Make the estate prop optional if it might be undefined
     isauctionMarketplace: boolean;
     ismyAuctionTokens:boolean;
+    ismyInvestmentTokens:boolean;
+    isInvestmentMarketplace:boolean;
   }
 
 export interface EstateActionProps {

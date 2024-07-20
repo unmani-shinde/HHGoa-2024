@@ -3,13 +3,15 @@
 
 import { Card } from "flowbite-react";
 import { EstateProps } from "@/utils/types/Estate";
-import { ListForAuctionButton,PlaceBidButton,AuctionDetailsDisplayButton } from "@/app/my-tokens";
+import { ListForAuctionButton,PlaceBidButton,AuctionDetailsDisplayButton, ListForInvestmentButton } from "@/app/my-tokens";
 import { useState } from "react";
 import { Label, TextInput } from "flowbite-react";
+import Web3 from "web3";
+import { useAccount } from "wagmi";
 
 
 
-export default function CardComponent({ estate,isauctionMarketplace,ismyAuctionTokens }: EstateProps) {
+export default function CardComponent({ estate,isauctionMarketplace,ismyAuctionTokens,isInvestmentMarketplace,ismyInvestmentTokens }: EstateProps) {
 
   const truncateAddress = (address: string, length: number = 6): string => {
     if (!address) return '';
@@ -18,6 +20,7 @@ export default function CardComponent({ estate,isauctionMarketplace,ismyAuctionT
   
 
   const [bid,setBid] = useState<string>("");
+  const account = useAccount();
   
   return (
     <Card
@@ -32,11 +35,11 @@ export default function CardComponent({ estate,isauctionMarketplace,ismyAuctionT
        Current Owner: {truncateAddress(estate?.estateOwner || '')}
       </p>
       <p style={{marginTop:'-1vh'}} className="font-normal text-gray-700 dark:text-gray-400">
-       Estate Evaluation: {Number(estate?.estateEvaluation)} tCORE
+       Estate Evaluation: {Web3.utils.fromWei(estate?.estateEvaluation.toString(),"ether")} tCORE
       </p>
       <div className={`flex lg:${isauctionMarketplace ? "flex-col" : "flex-row"} md:flex-col sm:flex-col items-center justify-between`}>
 
-        {isauctionMarketplace && (
+        {isauctionMarketplace && !(account.address==estate?.estateOwner) && (
           <div className="mb-4 ">
           <div className="mb-2 block">
             <Label htmlFor="small" value="Enter Bid Value" />
@@ -45,22 +48,20 @@ export default function CardComponent({ estate,isauctionMarketplace,ismyAuctionT
         </div>
         )}
         {
-          isauctionMarketplace && (
+          isauctionMarketplace && !(account.address==estate?.estateOwner) &&(
             <PlaceBidButton estateID={Number(estate?.estateID)} bid={bid}/>
           )
         }
         {
-          isauctionMarketplace || ismyAuctionTokens && (<AuctionDetailsDisplayButton estateID={Number(estate?.estateID)}/>)
+          (isauctionMarketplace || ismyAuctionTokens) && (<AuctionDetailsDisplayButton estateID={Number(estate?.estateID)}/>)
         }
         {!isauctionMarketplace && !(ismyAuctionTokens) && (<ListForAuctionButton estateID={Number(estate?.estateID)}/>)}
 
+        {!isInvestmentMarketplace && !(ismyInvestmentTokens) && (
+          <ListForInvestmentButton estateID={Number(estate?.estateID)}/>
+        )}
 
         
-        {!isauctionMarketplace && !(ismyAuctionTokens) && <button
-          className="rounded-lg bg-fuchsia-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-fuchsia-800 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 dark:bg-fuchsia-600 dark:hover:bg-fuchsia-700 dark:focus:ring-fuchsia-800"
-        >
-          List to Invest
-        </button> }
         
       </div>
     </Card>

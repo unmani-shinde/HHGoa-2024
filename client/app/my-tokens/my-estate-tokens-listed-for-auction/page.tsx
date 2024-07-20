@@ -19,7 +19,7 @@ export function EstateTokensListedforAuction() {
             const estateResult = estate.result as Estate;
             if (estateResult.estateOwner === address && estateResult.isListedForAuction) {
               return (
-              <CardComponent ismyAuctionTokens={true} isauctionMarketplace={false} estate={estateResult} />
+              <CardComponent isInvestmentMarketplace={false} ismyInvestmentTokens={false} ismyAuctionTokens={true} isauctionMarketplace={true} estate={estateResult} />
               );
             }
             return null; // Return null if the condition is not met

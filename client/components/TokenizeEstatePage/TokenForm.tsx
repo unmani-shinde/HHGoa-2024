@@ -3,6 +3,7 @@ import { useState,useEffect } from "react";
 import { HiArrowUpRight } from "react-icons/hi2";
 import { FactoryContract } from "@/contracts/FactoryContract";
 import ShareBlockLogo from "@/assets/blockShare.png";
+import Web3 from "web3";
 /*
   This example requires some changes to your config:
   
@@ -23,16 +24,16 @@ export function TokenForm() {
     const { address } = useAccount();
     const { writeContract } = useWriteContract();
     const [metadata,setMetadata] = useState<String>("");
-    const [evaluation,setEvaluation] = useState<Number>(0);
+    const [evaluation,setEvaluation] = useState<String>("");
 
-    const handleTokenizeEstate = (event) => {
+    const handleTokenizeEstate = (event:any) => {
       event.preventDefault();
       try {
         writeContract({
           abi: FactoryContract.abi,
           address: process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
           functionName: 'tokenizeEstate',
-          args: [metadata.toString(), Number(evaluation)],
+          args: [metadata.toString(), Web3.utils.toWei(evaluation.toString(),"ether")],
         });
         alert('The token creation was successful!');
       } catch (error) {
@@ -101,9 +102,9 @@ export function TokenForm() {
                   <input
                     id="evaluation"
                     name="evaluation"
-                    type="number"
+                    type="text"
                     required
-                    onChange={(e)=>{setEvaluation(Number(e.target.value))}}
+                    onChange={(e)=>{setEvaluation(e.target.value)}}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>

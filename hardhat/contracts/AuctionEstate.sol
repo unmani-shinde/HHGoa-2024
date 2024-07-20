@@ -63,16 +63,17 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
             uint256 bidPlaced = BidsPlaced[msg.sender];
             require(bidPlaced!=0 , "You have not placed any bet in this auction");
             payable(address(msg.sender)).transfer(bidPlaced);
-            delete BidsPlaced[address(msg.sender)];
+            BidsPlaced[address(msg.sender)] = 0;
         }
     }
 
-    function claimPrize() external payable  {
+    function claimPrize() external payable {
         //require(block.timestamp-timestamp> 24 hours, "Estate cannnot be claimed before 24 hours of the listing");
-        require(msg.sender==declareWinner(), "You aren't the winner!");
-        estateOwner.transfer(highestBid);
-        safeTransferFrom(address(this), auctionWinner, estateId, 1, "");
-        delete BidsPlaced[address(msg.sender)];
+        if(payable(address(msg.sender))==auctionWinner){
+            estateOwner.transfer(highestBid);
+            _safeTransferFrom(address(this), auctionWinner, estateId, 0, "");
+            BidsPlaced[address(msg.sender)] = 0;
+        }  
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory) external virtual returns (bytes4) {

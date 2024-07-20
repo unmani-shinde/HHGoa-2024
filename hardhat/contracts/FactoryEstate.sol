@@ -10,9 +10,6 @@ import "./WalletEstate.sol";
 contract EstateFactory is ERC1155{
 
     uint256 private _nextTokenId=1;
-    address private latestEstateAddress;
-    address private latestAuctionAddress;
-
 
     constructor()
         ERC1155("")        
@@ -55,7 +52,7 @@ contract EstateFactory is ERC1155{
 
     function listEstateForAuction(uint256 estateId) external {
         bytes32 _salt = keccak256(abi.encodePacked(block.timestamp, msg.sender));
-        latestAuctionAddress = Create2.deploy(0,_salt, abi.encodePacked(type(AuctionEstate).creationCode, abi.encode(estateId,Estates[estateId].estateEvaluation,block.timestamp,Estates[estateId].estateOwner))
+        address latestAuctionAddress = Create2.deploy(0,_salt, abi.encodePacked(type(AuctionEstate).creationCode, abi.encode(estateId,Estates[estateId].estateEvaluation,block.timestamp,Estates[estateId].estateOwner))
         );
         _safeTransferFrom(msg.sender,latestAuctionAddress, estateId, 1, "");
         EstateAuctionListings[estateId] = latestAuctionAddress;
@@ -63,10 +60,10 @@ contract EstateFactory is ERC1155{
     }
 
     function listEstateForInvestment(uint256 estateId) external  {
-        require(Estates[estateId].estateOwner==payable(address(msg.sender)),"You are not the current owner of this Estate!");
+        //require(Estates[estateId].estateOwner==payable(address(msg.sender)),"You are not the current owner of this Estate!");
 
         bytes32 _salt = keccak256(abi.encodePacked(block.timestamp, msg.sender));
-        latestEstateAddress = Create2.deploy(0,_salt, abi.encodePacked(type(WalletEstate).creationCode, abi.encode(estateId,Estates[estateId].estateEvaluation))
+        address latestEstateAddress = Create2.deploy(0,_salt, abi.encodePacked(type(WalletEstate).creationCode, abi.encode(estateId,Estates[estateId].estateEvaluation))
         );
 
         _safeTransferFrom(msg.sender,latestEstateAddress, estateId, 1, "");
@@ -86,6 +83,8 @@ contract EstateFactory is ERC1155{
 
     function updateOwner(uint256 estateID,address payable newOwner) external {
         Estates[estateID].estateOwner = newOwner;
+        Estates[estateID].isListedForAuction = false;
+        Estates[estateID].isListedForInvestment = false;
     }
 
     function getEstateAuctionListing(uint256 estateId) external view returns (address) {

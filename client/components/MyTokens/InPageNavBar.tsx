@@ -11,10 +11,10 @@ import { ConnectKitButton } from "connectkit";
 
 const navigation = [
     {optionContent:"My Owned Estate Tokens",optionURL:'/my-tokens/my-owned-estate-tokens',optionIcon:<GiWallet/>},
-    {optionContent:"My Estate Tokens Listed for Investment",optionURL:'#',optionIcon:<RiStockFill />},
+    {optionContent:"My Estate Tokens Listed for Investment",optionURL:'/my-tokens/my-estate-tokens-listed-for-investment',optionIcon:<RiStockFill />},
     {optionContent:"My Estate Tokens Listed for Auction",optionURL:'/my-tokens/my-estate-tokens-listed-for-auction',optionIcon:<RiAuctionFill />},
     {optionContent:"Estate Investments in Progress",optionURL:'#',optionIcon:<BsGraphUpArrow />},
-    {optionContent:"Estate Auctions in Progress",optionURL:'#',optionIcon:<FaPeopleRoof />},
+    {optionContent:"Estate Auctions I'm Participating In",optionURL:'/my-tokens/estate-auctions-participating-in',optionIcon:<FaPeopleRoof />},
 
 ]
 
