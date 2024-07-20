@@ -17,9 +17,9 @@ export function AuctionsMarketplace() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {estates?.map((estate, index) => {
             const estateResult = estate.result as Estate;
-            if (estateResult.estateOwner === address && estateResult.isListedForAuction) {
+            if (estateResult.estateOwner !== address && estateResult.isListedForAuction) {
               return (
-                <CardComponent key={index} estate={estateResult} />
+                <CardComponent ismyAuctionTokens={false} isauctionMarketplace={true} key={index} estate={estateResult} />
               );
             }
             return null; // Return null if the condition is not met

@@ -1,9 +1,16 @@
 "use client"
-import React from 'react';
+
+import { Button, Modal, Select } from "flowbite-react";
+import React,{ useState } from "react";
 import { FactoryContract } from '@/contracts/FactoryContract';
-import { useReadContract, useWriteContract } from "wagmi";
+import { useReadContract, useWriteContract,useReadContracts } from "wagmi";
 import { AuctionContract } from '@/contracts/AuctionContract';
-import { EstateActionProps  } from "@/utils/types/Estate"
+import { EstateBidActionProps,EstateActionProps  } from "@/utils/types/Estate"
+import Web3 from "web3"
+import { Table } from "flowbite-react";
+
+
+
 
 export const ListForAuctionButton = ({ estateID }:EstateActionProps) => {
   
@@ -60,7 +67,7 @@ return (
 );
 };
 
-export const PlaceBidButton = ({ estateID }:EstateActionProps) =>{
+export const PlaceBidButton = ({ estateID,bid }:EstateBidActionProps) =>{
 
     const { writeContract} = useWriteContract();
 
@@ -71,18 +78,153 @@ export const PlaceBidButton = ({ estateID }:EstateActionProps) =>{
         args:[estateID]
     })
 
-    const handleButtonClick = async (bid:Number) => {
+    const handleButtonClick = async () => {
         try {
         writeContract({
             abi: AuctionContract.abi,
             address: listingAddress as `0x${string}`,
             functionName: 'placeBid',
-            args: [bid],
+            args: [Number(Web3.utils.toWei(bid,'ether'))],
+            value:BigInt(Web3.utils.toWei(bid,'ether'))
         });
         } catch (error) {
         console.error('Transaction failed', error);
         }
     };
+
+    return (
+      <button
+      onClick={handleButtonClick}
+      className="rounded-lg md:mb-2 sm:mb-2 mb-2 bg-fuchsia-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-fuchsia-800 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 dark:bg-fuchsia-600 dark:hover:bg-fuchsia-700 dark:focus:ring-fuchsia-800"
+      >
+      Place Bid
+      </button>
+  );
+
+}
+
+export const AuctionDetailsDisplayButton = ({ estateID }:EstateActionProps) =>{
+
+  const { writeContract} = useWriteContract();
+  const [openModal, setOpenModal] = useState(false);
+  const [colourReveal, setColourReveal] = useState(false);
+  const [modalPlacement, setModalPlacement] = useState('center')
+
+  const { data:listingAddress } = useReadContract({
+      abi:FactoryContract.abi,
+      address:process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
+      functionName:'getEstateAuctionListing',
+      args:[estateID]
+  })
+
+  const {data:auctionData} = useReadContract({
+    abi: AuctionContract.abi,
+    address: listingAddress as `0x${string}`,
+    functionName: 'getAuctionDetails'
+  })
+  const address = auctionData?.[3];
+
+  const {data:allBiddersAddresses} = useReadContract({
+    abi: AuctionContract.abi,
+    address: listingAddress as `0x${string}`,
+    functionName: 'getAllBidders'
+  })
+
+  const contractCalls = Array.from({ length: allBiddersAddresses?.length }).map(
+    (_, index) => ({
+        abi: AuctionContract.abi,
+        address: listingAddress as `0x${string}`,
+        functionName: "getBidDetails",
+        args: [allBiddersAddresses[index]],
+    })
+);
+
+const { data: bids, isLoading: bidsLoading } = useReadContracts({
+    contracts: contractCalls
+});
+
+  const { data:winnerAddress } = useReadContract({
+  abi: AuctionContract.abi,
+    address: listingAddress as `0x${string}`,
+    functionName: 'declareWinner'
+
+})
+
+  // const handleButtonClick = async () => {
+  //     try {
+  //     writeContract({
+  //         abi: AuctionContract.abi,
+  //         address: listingAddress as `0x${string}`,
+  //         functionName: 'placeBid',
+  //         args: [Number(Web3.utils.toWei(bid,'ether'))],
+  //         value:BigInt(Web3.utils.toWei(bid,'ether'))
+  //     });
+  //     } catch (error) {
+  //     console.error('Transaction failed', error);
+  //     }
+  // };
+
+  return (
+    <>
+      <button
+    onClick={()=>{setOpenModal(true)}}
+    className="rounded-lg md:mb-2 sm:mb-2 mb-2 bg-fuchsia-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-fuchsia-800 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 dark:bg-fuchsia-600 dark:hover:bg-fuchsia-700 dark:focus:ring-fuchsia-800"
+    >
+    View Details
+    </button>
+    <Modal
+    show={openModal}
+    position={modalPlacement}
+    onClose={() => setOpenModal(false)}
+  >
+    <Modal.Header><p className="font-semibold">Auction Details</p></Modal.Header>
+    <Modal.Body>
+      <div className="flex flex-col">
+        <p><b><a href={`https://scan.test.btcs.network/address/${listingAddress}`}>Auction Contract</a>: </b>{listingAddress}</p>
+        <p className="mb-2"><b><a href={`https://scan.test.btcs.network/address/${address}`}>Current Owner</a>: </b>{auctionData?.[3]}</p>
+        <hr></hr>
+        <p className="mt-4"><b>Estate Token ID: </b>#{Number(auctionData?.[0])}</p>
+        <p className="mb-2"><b>Estate Token Evaluation: </b>{Number(auctionData?.[1])} tCORE</p>
+        <hr></hr>
+        <p className="mt-4 mb-2"><b>Bidders List: </b></p>
+
+      </div>
+    <div className="overflow-x-auto">
+      <Table>
+        <Table.Head>
+          <Table.HeadCell>Bidder Address</Table.HeadCell>
+          <Table.HeadCell>Bid Price (tCORE)</Table.HeadCell>
+          
+        </Table.Head>
+        <Table.Body className="divide-y">
+          {bids?.map((bid,index)=>{
+            return(
+
+              <Table.Row className={`${allBiddersAddresses[index] === winnerAddress && colourReveal ? "bg-green-300" : "bg-white"} dark:border-gray-700 dark:bg-gray-800`}>
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                {allBiddersAddresses[index]}
+              </Table.Cell>
+              <Table.Cell>
+                {Web3.utils.fromWei(Number(bid?.result), "ether")}
+              </Table.Cell>
+            </Table.Row>
+
+
+            )
+          })}
+         
+         
+        </Table.Body>
+      </Table>
+    </div>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button color="purple" onClick={() => setColourReveal(true)}>Get Auction Winner</Button>
+    </Modal.Footer>
+  </Modal>
+    
+    </>
+);
 
 }
 

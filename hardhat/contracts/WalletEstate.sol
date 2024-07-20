@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract WalletEstate is ERC1155,IERC1155Receiver {
 
-    uint256 public  constant WALLET_TOKEN = 0;
+    uint256 private constant WALLET_TOKEN = 0;
     uint256 private estateId;
     uint256 private estateEvaluation;
     address payable private estateOwner;
@@ -24,7 +24,7 @@ contract WalletEstate is ERC1155,IERC1155Receiver {
         _mint(address(msg.sender), WALLET_TOKEN, 10**18, "");
     }
 
-    function purchaseShares(uint256 quantity) public payable  {
+    function purchaseShares(uint256 quantity) external payable  {
         require(quantity<=100,"Maximum number of shares that can be purchased is 100");
         require(quantity>0, "Number of shares purchased cannot be zero or less");
         require(quantity<balanceOf(address(this), WALLET_TOKEN),"There aren't sufficient shares to be purchased");
@@ -37,14 +37,14 @@ contract WalletEstate is ERC1155,IERC1155Receiver {
        estateShareHolders[address(msg.sender)] = quantity;
     }
 
-    function transferShares(address receiver,uint256 quantity) public {
+    function transferShares(address receiver,uint256 quantity) external {
         require(quantity <= estateShareHolders[address(msg.sender)], "Insufficient shares to be transferred to recepient");
         safeTransferFrom(address(msg.sender), receiver, WALLET_TOKEN, quantity, "");
         estateShareHolders[address(msg.sender)] -= quantity;
         estateShareHolders[receiver] += quantity;
     }
 
-    function sellShares(uint256 quantity) public payable {
+    function sellShares(uint256 quantity) external payable {
         require(quantity <= estateShareHolders[address(msg.sender)], "Insufficient shares to be sold");
         safeTransferFrom(address(msg.sender), address(this), WALLET_TOKEN, quantity, "");
 
@@ -53,11 +53,11 @@ contract WalletEstate is ERC1155,IERC1155Receiver {
         estateShareHolders[address(msg.sender)] -=quantity; 
     }
 
-    function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
+    function onERC1155Received(address, address, uint256, uint256, bytes memory) external virtual returns (bytes4) {
         return this.onERC1155Received.selector;
     }
 
-    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) public virtual returns (bytes4) {
+    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) external virtual returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
     }
 

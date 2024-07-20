@@ -15,7 +15,9 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
     uint256 private timestamp;
     address payable private estateOwner;
 
-    mapping (address=>uint256) public BidsPlaced;
+    address payable [] private bidders;
+    
+    mapping (address=>uint256) private BidsPlaced;
 
 
     constructor(uint256 _id,uint256 _evaluation,uint256 _timestamp,address payable owner)
@@ -31,26 +33,31 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
         return(estateId,estateEvaluation,highestBid,estateOwner,auctionWinner,timestamp);
     }
 
-    function getAllBids() internal view returns(mapping (address=>uint256) storage){
-        return BidsPlaced;
+    function getAllBidders() external view returns(address payable [] memory){
+        return bidders;
     }
 
-    function placeBid(uint256 bid) public payable  {
+    function getBidDetails(address payable bidder) external view returns(uint256){
+        return (BidsPlaced[bidder]);
+    }
+
+    function placeBid(uint256 bid) external payable  {
         //require(block.timestamp - timestamp <= 24 hours,"This listing has expired");
         require(bid>estateEvaluation, "Bid placed must be higher than the evaluation of the timestamp");
         BidsPlaced[msg.sender] = bid;
+        bidders.push(payable(address(msg.sender)));
         if(highestBid<bid){
             highestBid = bid;
             auctionWinner = payable(address(msg.sender));
         }
     }
 
-    function declareWinner() public view returns(address payable ) {
+    function declareWinner() public view returns(address payable) {
         //require(block.timestamp-timestamp> 24 hours, "Winner cannot be declared before 24 hours of the listing");
         return auctionWinner;
     }
 
-    function withdrawMyFunds() public payable {
+    function withdrawMyFunds() external payable {
         //require(block.timestamp-timestamp> 24 hours, "Funds cannot be withdrawn before 24 hours of the listing");
         if(payable(address(msg.sender))!=auctionWinner){
             uint256 bidPlaced = BidsPlaced[msg.sender];
@@ -60,7 +67,7 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
         }
     }
 
-    function claimPrize() public payable  {
+    function claimPrize() external payable  {
         //require(block.timestamp-timestamp> 24 hours, "Estate cannnot be claimed before 24 hours of the listing");
         require(msg.sender==declareWinner(), "You aren't the winner!");
         estateOwner.transfer(highestBid);
@@ -68,11 +75,11 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
         delete BidsPlaced[address(msg.sender)];
     }
 
-    function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
+    function onERC1155Received(address, address, uint256, uint256, bytes memory) external virtual returns (bytes4) {
         return this.onERC1155Received.selector;
     }
 
-    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) public virtual returns (bytes4) {
+    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) external virtual returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
     }
 
