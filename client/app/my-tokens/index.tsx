@@ -15,11 +15,11 @@ import { InvestmentContract } from "@/contracts/InvestmentContract";
 
 export const ListForAuctionButton = ({ estateID }:EstateActionProps) => {
   
-    const { writeContract} = useWriteContract();
+    const { writeContract,writeContractAsync} = useWriteContract();
   
     const handleButtonClick = async () => {
       try {
-        writeContract({
+        await writeContractAsync({
           abi: FactoryContract.abi,
           address: process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
           functionName: 'listEstateForAuction',
@@ -127,7 +127,7 @@ export const PurchaseSharesButton = ({ estateID,sharesCount}:EstateInvestActionP
   const estateEvaluation = Number(investmentData?.[1]);
   const valuePerToken = estateEvaluation/100;
   const shareInvestment = valuePerToken*sharesCount;
-  console.log(Web3.utils.fromWei(shareInvestment.toString(),"ether"));
+  //console.log(Web3.utils.fromWei(shareInvestment.toString(),"ether"));
   
 
   const handleButtonClick = async () => {
