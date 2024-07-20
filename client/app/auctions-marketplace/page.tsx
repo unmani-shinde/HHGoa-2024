@@ -30,7 +30,7 @@ export function AuctionsMarketplace() {
     
 }
 
-export default function Page() {
+export default function App() {
     return(
         <Web3Provider>
             <AuctionsMarketplace/>
