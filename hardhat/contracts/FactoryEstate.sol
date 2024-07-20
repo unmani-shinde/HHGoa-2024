@@ -4,10 +4,11 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "./AuctionEstate.sol";
 import "./WalletEstate.sol";
 
-contract EstateFactory is ERC1155{
+contract EstateFactory is ERC1155,IERC1155Receiver{
 
     uint256 private _nextTokenId=1;
 
@@ -54,21 +55,19 @@ contract EstateFactory is ERC1155{
         bytes32 _salt = keccak256(abi.encodePacked(block.timestamp, msg.sender));
         address latestAuctionAddress = Create2.deploy(0,_salt, abi.encodePacked(type(AuctionEstate).creationCode, abi.encode(estateId,Estates[estateId].estateEvaluation,block.timestamp,Estates[estateId].estateOwner))
         );
-        _safeTransferFrom(msg.sender,latestAuctionAddress, estateId, 1, "");
+        safeTransferFrom(msg.sender,latestAuctionAddress, estateId, 1, "");
         EstateAuctionListings[estateId] = latestAuctionAddress;
         Estates[estateId].isListedForAuction = true;
     }
 
-    function listEstateForInvestment(uint256 estateId) external  {
-        //require(Estates[estateId].estateOwner==payable(address(msg.sender)),"You are not the current owner of this Estate!");
+     function listEstateForInvestment(uint256 estateId) external  {
+      
+        IERC1155Receiver newContract = new WalletEstate(estateId,Estates[estateId].estateEvaluation);
+        safeTransferFrom(msg.sender,address(newContract), estateId, 1, "");
+        _mint(address(msg.sender), 0, 100, "");
+         safeTransferFrom(msg.sender,address(newContract), 0, 100, "");
 
-        bytes32 _salt = keccak256(abi.encodePacked(block.timestamp, msg.sender));
-        address latestEstateAddress = Create2.deploy(0,_salt, abi.encodePacked(type(WalletEstate).creationCode, abi.encode(estateId,Estates[estateId].estateEvaluation))
-        );
-
-        _safeTransferFrom(msg.sender,latestEstateAddress, estateId, 1, "");
-
-        EstateInvestmentListings[estateId] = latestEstateAddress;
+        EstateInvestmentListings[estateId] = address(newContract);
         Estates[estateId].isListedForInvestment = true;
         
     }
@@ -109,6 +108,18 @@ contract EstateFactory is ERC1155{
         
     {
         _mintBatch(to, ids, amounts, data);
+    }
+
+     function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual override returns (bytes4) {
+        return this.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) public virtual override returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, IERC165) returns (bool) {
+        return interfaceId == type(IERC1155Receiver).interfaceId || super.supportsInterface(interfaceId);
     }
 
 

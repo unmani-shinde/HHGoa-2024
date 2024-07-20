@@ -24,6 +24,11 @@ export interface EstateBidActionProps {
   bid:string;
 }
 
+export interface EstateInvestActionProps {
+  estateID: number; // Make the estate prop optional if it might be undefined
+  sharesCount: number;
+}
+
 export interface MyTokensPageLayoutProps {
     children: React.ReactNode;
   }

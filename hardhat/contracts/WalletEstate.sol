@@ -16,12 +16,26 @@ contract WalletEstate is ERC1155,IERC1155Receiver {
 
     mapping (address=>uint256) estateShareHolders;
 
+    address payable [] private investors;
+
     constructor(uint256 _id,uint256 _evaluation)
         ERC1155("")
     {   estateId = _id;
         estateEvaluation = _evaluation;
         estateOwner = payable(address(msg.sender));
-        _mint(address(msg.sender), WALLET_TOKEN, 10**18, "");
+        
+    }
+
+     function getInvestmentDetails() external view returns(uint256,uint256,address payable){
+        return(estateId,estateEvaluation,estateOwner);
+    }
+
+    function getAllInvestors() external view returns(address payable [] memory){
+        return investors;
+    }
+
+    function getInvestmentDetails(address payable investor) external view returns(uint256){
+        return (estateShareHolders[investor]);
     }
 
     function purchaseShares(uint256 quantity) external payable  {
@@ -29,12 +43,13 @@ contract WalletEstate is ERC1155,IERC1155Receiver {
         require(quantity>0, "Number of shares purchased cannot be zero or less");
         require(quantity<balanceOf(address(this), WALLET_TOKEN),"There aren't sufficient shares to be purchased");
 
-        uint256 share_evaluation = ((estateEvaluation*10**18)/100)*quantity;
-        require(share_evaluation==msg.value,"Incorrect funds sent!");
+        //uint256 share_evaluation = ((estateEvaluation*10**18)/100)*quantity;
+        //require(share_evaluation==msg.value,"Incorrect funds sent!");
         payable(address(this)).transfer(msg.value);
 
        safeTransferFrom(address(this), address(msg.sender), WALLET_TOKEN, quantity, "");
        estateShareHolders[address(msg.sender)] = quantity;
+       investors.push(payable(address(msg.sender)));
     }
 
     function transferShares(address receiver,uint256 quantity) external {

@@ -20,14 +20,14 @@ export default function Hero() {
           
           <div className="text-center">
             <h1 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-6xl">
-            Elementary, my dear investor: Fractional ownership.
+            Invest in Real Estate, One Token at a Time.
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-            ShareBlock leverages innovative blockchain technology to unlock the long-term value proposition of real estate.  By facilitating fractional ownership, we democratize access to this asset class, driving economic growth and portfolio diversification for a wider investor base.
+            Own a piece of the future of real estate. ShareBlock combines the power of auctions with fractional ownership, allowing you to invest in high-value properties with lower capital requirements. Experience a seamless and secure process for acquiring tokenized real estate assets, participating in exciting auctions, and earning passive income through rent distribution.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <ConnectKitButton/>
-              <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+              <a href="/tokenize-estate" className="text-sm font-semibold leading-6 text-gray-900">
                 {isConnected && isClient?"Create My First Token!":"Learn more"} <span aria-hidden="true">→</span>
               </a>
             </div>

@@ -5,8 +5,9 @@ import React,{ useState } from "react";
 import { FactoryContract } from '@/contracts/FactoryContract';
 import { AuctionContract } from '@/contracts/AuctionContract';
 import { useReadContract, useWriteContract,useReadContracts,useAccount,useDeployContract } from "wagmi";
-import { EstateBidActionProps,EstateActionProps  } from "@/utils/types/Estate"
+import { EstateBidActionProps,EstateActionProps, EstateInvestActionProps  } from "@/utils/types/Estate"
 import Web3 from "web3"
+import { InvestmentContract } from "@/contracts/InvestmentContract";
 
 
 
@@ -101,6 +102,56 @@ export const PlaceBidButton = ({ estateID,bid }:EstateBidActionProps) =>{
       Place Bid
       </button>
   );
+
+}
+
+export const PurchaseSharesButton = ({ estateID,sharesCount}:EstateInvestActionProps) =>{
+
+  const { writeContract,writeContractAsync} = useWriteContract();
+
+  
+  const { data:listingAddress } = useReadContract({
+      abi:FactoryContract.abi,
+      address:process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_ADDRESS as `0x${string}`,
+      functionName:'getEstateInvestmentListing',
+      args:[estateID]
+  })
+
+  const { data:investmentData } = useReadContract({
+    abi:InvestmentContract.abi,
+    address:listingAddress as `0x${string}`,
+    functionName:'getInvestmentDetails',
+    args:[]
+})
+
+  const estateEvaluation = Number(investmentData?.[1]);
+  const valuePerToken = estateEvaluation/100;
+  const shareInvestment = valuePerToken*sharesCount;
+  console.log(Web3.utils.fromWei(shareInvestment.toString(),"ether"));
+  
+
+  const handleButtonClick = async () => {
+      try {
+      await writeContractAsync({
+          abi: InvestmentContract.abi,
+          address: listingAddress as `0x${string}`,
+          functionName: 'purchaseShares',
+          args: [BigInt(sharesCount)],
+          value:BigInt(Number(shareInvestment))
+      });
+      } catch (error) {
+      console.error('Transaction failed', error);
+      }
+  };
+
+  return (
+    <button
+    onClick={handleButtonClick}
+    className="rounded-lg md:mb-2 sm:mb-2 mb-2 bg-fuchsia-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-fuchsia-800 focus:outline-none focus:ring-4 focus:ring-fuchsia-300 dark:bg-fuchsia-600 dark:hover:bg-fuchsia-700 dark:focus:ring-fuchsia-800"
+    >
+    Purchase Shares
+    </button>
+);
 
 }
 

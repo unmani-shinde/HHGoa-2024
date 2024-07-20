@@ -71,16 +71,16 @@ contract AuctionEstate is ERC1155,IERC1155Receiver {
         //require(block.timestamp-timestamp> 24 hours, "Estate cannnot be claimed before 24 hours of the listing");
         if(payable(address(msg.sender))==auctionWinner){
             estateOwner.transfer(highestBid);
-            _safeTransferFrom(address(this), auctionWinner, estateId, 0, "");
+            safeTransferFrom(address(this), auctionWinner, estateId, 0, "");
             BidsPlaced[address(msg.sender)] = 0;
         }  
     }
 
-    function onERC1155Received(address, address, uint256, uint256, bytes memory) external virtual returns (bytes4) {
+    function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
         return this.onERC1155Received.selector;
     }
 
-    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) external virtual returns (bytes4) {
+    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) public virtual returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
     }
 
